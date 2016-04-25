@@ -22,11 +22,11 @@ def execute_sql (conn, cur, filepath):
     sqlFile = fd.read().decode("utf-8-sig").encode("utf-8")
     fd.close()
 
-    print 'Executing SQL-file %s...' %filepath
+    print ('Executing SQL-file %s...' %filepath)
     cur.execute(sqlFile)
     conn.commit()
 
-    print 'SQL-file %s executed!' %filepath
+    print ('SQL-file %s executed!' %filepath)
 
 
 # Yes-No function
