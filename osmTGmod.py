@@ -55,6 +55,19 @@ class grid_model:
         self.standard_db = 'postgres'
 
         self.raw_data_dir = os.path.dirname(os.getcwd()) + "/raw_data"
+        self.result_dir = os.path.dirname(os.getcwd()) + "/results"
+        self.qgis_projects_dir = os.path.dirname(os.getcwd()) + "/qgis_projects"
+        
+        print("Checking/Creating file directories")
+        
+        if not os.path.exists(self.raw_data_dir):
+            os.makedirs(self.raw_data_dir)
+            
+        if not os.path.exists(self.result_dir):
+            os.makedirs(self.result_dir)
+            
+        if not os.path.exists(self.qgis_projects_dir):
+            os.makedirs(self.qgis_projects_dir)
 
         print ("Connecting to Server...")
 
@@ -92,7 +105,7 @@ class grid_model:
             # Exit the script and print an error telling what happened.
             # Checks if only password wrong???
             print ("There is no Database named '%s'!" % (self.database))
-            choice = raw_input("Do you wish to create Database '%s' and build up osmTgmod-database?:" % (self.database)).lower()
+            choice = input("Do you wish to create Database '%s' and build up osmTgmod-database?:" % (self.database)).lower()
 
             if general_funcs.ask_yes_no(choice) == True:
                 print ("OK lets go! Creating Database...")
@@ -129,7 +142,7 @@ class grid_model:
                     # Get the most recent exception
                     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
                     # Exit the script and print an error telling what happened.
-                    print ("Undefinded Problem! Could not connect to new Database '%s'! (Please drop new database and try again)" % (self.database))
+                    sys.exit("Undefinded Problem! Could not connect to new Database '%s'! (Please drop new database and try again)" % (self.database))
 
             else:
                 sys.exit("NO Database is created - Programm cancelled by user!")
@@ -158,7 +171,7 @@ class grid_model:
 
         if downloaded == None:
             print ("No OSM-Data found in Database!")
-            choice = raw_input("Do you wish to load OSM-Data into Database?: ").lower()
+            choice = input("Do you wish to load OSM-Data into Database?: ").lower()
 
             if general_funcs.ask_yes_no(choice) == True:
                 self.update_osm_data()
@@ -189,9 +202,11 @@ class grid_model:
 
     # Function to download OSM-Data
     def download_osm_data(self, filename):
-        osm_data = urllib.URLopener()
-        # existing data is overwritten
-        osm_data.retrieve("http://ftp5.gwdg.de/pub/misc/openstreetmap/download.geofabrik.de/germany-latest.osm.pbf", self.raw_data_dir + "/" + filename)
+        
+        urllib.request.urlretrieve("http://ftp5.gwdg.de/pub/misc/openstreetmap/download.geofabrik.de/germany-latest.osm.pbf", self.raw_data_dir + "/" + filename)
+#        osm_data = urllib.URLopener()
+#        # existing data is overwritten
+#        osm_data.retrieve("http://ftp5.gwdg.de/pub/misc/openstreetmap/download.geofabrik.de/germany-latest.osm.pbf", self.raw_data_dir + "/" + filename)
 
     # Function to filter OSM-Data
     def osmosis_filter(self, filename_raw, filename_filter):
@@ -260,7 +275,7 @@ class grid_model:
 
         not_valid = True
         while not_valid:
-            choice = raw_input("What would you like to do?")
+            choice = input("What would you like to do?")
 
             if choice == '1':
 
@@ -298,8 +313,8 @@ class grid_model:
 
                 print ("""Info: Unfiltered osm.pbf-File needs to be in "raw_data"-Directory""")
 
-                filename_raw = raw_input("Name of raw OSM-file (e.g. germany-latest.osm.pbf):")
-                filename_filter = raw_input("Name of filtered (destination) OSM-file (e.g. germany-latest-filtered.osm.pbf):")
+                filename_raw = input("Name of raw OSM-file (e.g. germany-latest.osm.pbf):")
+                filename_filter = input("Name of filtered (destination) OSM-file (e.g. germany-latest-filtered.osm.pbf):")
 
 
                 self.osmosis_filter(filename_raw, filename_filter)
@@ -310,10 +325,10 @@ class grid_model:
 
             elif choice == '3':
 
-                print ("""Info: Filtered osm.pbf-File needs to be in "raw_data"-Directory"""=
+                print ("""Info: Filtered osm.pbf-File needs to be in "raw_data"-Directory""")
 
-                filename_filter = raw_input("Name of filtered OSM-file:")
-                v_date = raw_input("Download Date (E.g. 2015-10-23):")
+                filename_filter = input("Name of filtered OSM-file:")
+                v_date = input("Download Date (E.g. 2015-10-23):")
 
 
                 self.osmosis_import(filename_filter, v_date)
@@ -407,7 +422,7 @@ class grid_model:
         4. Quit
         """)
 
-        choice = raw_input("Make a choice:")
+        choice = input("Make a choice:")
 
         if choice == '1':
 
@@ -467,15 +482,15 @@ if __name__ == '__main__':
     print ('osmTGmod started as Script')
     print ('Please provide connection-parameters:')
 
-    database = raw_input('database name:')
-    password = raw_input('password:')
+    database = input('database name:')
+    password = input('password:')
 
-    proposed_path = os.getenv("HOME") + "/.qgis2/processing/scripts/"
-    qgis_processing_path = raw_input('QGis-Processing Path (default: ' + proposed_path + '):') or proposed_path
+    proposed_path = "/usr/share/qgis/python/plugins/processing/script/scripts"
+    qgis_processing_path = input('QGis-Processing Path (default: ' + proposed_path + '):') or proposed_path
 
-    host = raw_input('host (default 192.168.0.46):') or '192.168.0.46'
-    port = raw_input('port (default 5432):') or '5432'
-    user = raw_input('user (default postgres):') or 'postgres'
+    host = input('host (default 192.168.0.46):') or '192.168.0.46'
+    port = input('port (default 5432):') or '5432'
+    user = input('user (default postgres):') or 'postgres'
 
     print ('Grid Model Object is created...')
     grid_model = grid_model(database, password, qgis_processing_path, host, port, user)
@@ -493,7 +508,7 @@ if __name__ == '__main__':
         7. Quit
         """)
 
-        choice = raw_input("What would you like to do?")
+        choice = input("What would you like to do?")
 
         if choice == '1':
 
@@ -507,10 +522,10 @@ if __name__ == '__main__':
 
         elif choice == '2':
 
-            v_plan_ids = raw_input("Development plan IDs (e.g. 1;2) (default None):") or None
-            v_year = raw_input("Year of application (e.g. 2020) (default None):") or None
-            main_station = raw_input("Substation with slack node (OSM-ID) (default 35176751):") or 35176751
-            user_comment = raw_input("User comment:") or None
+            v_plan_ids = input("Development plan IDs (e.g. 1;2) (default None):") or None
+            v_year = input("Year of application (e.g. 2020) (default None):") or None
+            main_station = input("Substation with slack node (OSM-ID) (default 35176751):") or 35176751
+            user_comment = input("User comment:") or None
 
             try:
                 grid_model.execute_abstraction(v_plan_ids, v_year, main_station, user_comment)
@@ -521,8 +536,8 @@ if __name__ == '__main__':
 
         elif choice == '3':
             result_dir = os.path.dirname(os.getcwd()) + "/results/"
-            result_id = raw_input("Result ID:")
-            path = raw_input("Result Path (default: "+result_dir+"):") or result_dir
+            result_id = input("Result ID:")
+            path = input("Result Path (default: "+result_dir+"):") or result_dir
 
             try:
                 grid_model.write_to_csv(result_id, path)
@@ -550,9 +565,9 @@ if __name__ == '__main__':
                 exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
                 print ('Error while fetching Data! Error: %s' %(exceptionValue))
 
-            id = raw_input("New ID of Development-Plan: ")
-            name = raw_input("Name of new (empty) Development-Plan (e.g. EnlaG):")
-            comment= raw_input("Comment:")
+            id = input("New ID of Development-Plan: ")
+            name = input("Name of new (empty) Development-Plan (e.g. EnlaG):")
+            comment= input("Comment:")
 
             try:
                 grid_model.insert_plan(id, name, comment)
