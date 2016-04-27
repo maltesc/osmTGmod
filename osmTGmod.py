@@ -27,7 +27,7 @@ import urllib
 import datetime
 import sys
 
-import shutil
+#import shutil
 
 import general_funcs
 import build_up_db
@@ -53,13 +53,15 @@ class grid_model:
         self.database = database
 
         self.standard_db = 'postgres'
+        
+        self.osmosis_path = os.getcwd() + '/osmosis/bin/osmosis'
 
         self.raw_data_dir = os.path.dirname(os.getcwd()) + "/raw_data"
         self.result_dir = os.path.dirname(os.getcwd()) + "/results"
         self.qgis_projects_dir = os.path.dirname(os.getcwd()) + "/qgis_projects"
         
         print("Checking/Creating file directories")
-        
+        # Basic folders are created if not existent
         if not os.path.exists(self.raw_data_dir):
             os.makedirs(self.raw_data_dir)
             
@@ -193,8 +195,9 @@ class grid_model:
             # Writing Processing files
         qgis_processing.write_processing(qgis_processing_path)
 
-        print ("Writing QGis-poject files...")
-        qgis_projects.write_projects(database, password, host, port, user)
+        # this is disabled, due to version problems in QGis
+        # print ("Writing QGis-poject files...")
+        # qgis_projects.write_projects(database, password, host, port, user)
 
         print ("Grid Model is ready to use!")
 
@@ -210,15 +213,16 @@ class grid_model:
 
     # Function to filter OSM-Data
     def osmosis_filter(self, filename_raw, filename_filter):
-        # osmosis_path = os.getcwd() + '/osmosis/bin/osmosis'
 
         # Input and Output file_paths
         file_path = self.raw_data_dir + "/" + filename_raw
         output_file_path = self.raw_data_dir + "/" + filename_filter
 
         # Accesses Osmosis Installation (Only works with installed Osmosis)
-        proc = subprocess.Popen('osmosis --rbf %s --tf accept-ways power=* --tf accept-relations route=power --used-node --wb %s'
-                         %(file_path, output_file_path), shell=True)
+
+        proc = subprocess.Popen('%s --rbf %s --tf accept-ways power=* --tf accept-relations route=power --used-node --wb %s'
+                         %(self.osmosis_path, file_path, output_file_path), shell=False)
+                         
         print ("Filtering OSM-Data...")
         proc.wait() # To make sure Script waits until Osmosis is ready...
 
@@ -238,11 +242,10 @@ class grid_model:
         """)
         self.conn.commit()
 
-        # osmosis_path = os.getcwd() + '/osmosis/bin/osmosis'
         file_path = self.raw_data_dir + "/" + filename
 
-        proc = subprocess.Popen('osmosis --read-pbf %s --write-pgsql database=%s host=%s user=%s password=%s'
-                         %(file_path, self.database, self.host, self.user, self.password), shell=True)
+        proc = subprocess.Popen('%s --read-pbf %s --write-pgsql database=%s host=%s user=%s password=%s'
+                         %(self.osmosis_path, file_path, self.database, self.host, self.user, self.password), shell=True)
         print ('Importing OSM-Data...')
         proc.wait() # To make sure Script waits until Osmosis is ready...
 
@@ -320,8 +323,7 @@ class grid_model:
                 self.osmosis_filter(filename_raw, filename_filter)
 
                 not_valid = False
-
-
+                
 
             elif choice == '3':
 
@@ -485,9 +487,10 @@ if __name__ == '__main__':
     database = input('database name:')
     password = input('password:')
 
-    proposed_path = "/usr/share/qgis/python/plugins/processing/script/scripts"
-    qgis_processing_path = input('QGis-Processing Path (default: ' + proposed_path + '):') or proposed_path
-
+    # QGis 2.8 uses this path!
+    proposed_path = "/home/malte/.qgis2/processing/scripts/"
+    qgis_processing_path = input('QGis-Processing Path (make sure you have writing permission)(default: ' + proposed_path + '):') or proposed_path
+    
     host = input('host (default 192.168.0.46):') or '192.168.0.46'
     port = input('port (default 5432):') or '5432'
     user = input('user (default postgres):') or 'postgres'
