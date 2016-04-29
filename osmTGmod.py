@@ -32,7 +32,7 @@ import sys
 import general_funcs
 import build_up_db
 import qgis_processing
-import qgis_projects
+#import qgis_projects
 
 
 class grid_model:
