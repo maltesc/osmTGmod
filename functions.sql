@@ -1030,10 +1030,18 @@ UPDATE branch_data
 	WHERE 	wires IS NULL AND
 		voltage >= v_min_voltage AND
 		voltage < 380000 AND
+		voltage > 110000 AND
+		frequency = 50 AND
+		power = 'line';
+UPDATE branch_data
+	SET 	wires = 1 -- Standard für 110kv??
+	WHERE 	wires IS NULL AND
+		voltage >= v_min_voltage AND
+		voltage <= 110000 AND
 		frequency = 50 AND
 		power = 'line';
 UPDATE branch_data 
-	SET wires = 1
+	SET wires = 1 -- Why that? HGÜ??
 	WHERE wires IS NULL AND
 	power = 'line';
 	
