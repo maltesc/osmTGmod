@@ -59,8 +59,8 @@ INSERT INTO base_MVA VALUES (100);
 -- (Macht es Sinn eine Mindesspannung zu verwenden?)
 -- Bei den Leitungskennwerten fehlen noch Werte für alle untersuchten Spannungen
 CREATE TABLE min_voltage (voltage INT);
-INSERT INTO min_voltage (voltage) VALUES (110000);
---INSERT INTO min_voltage (voltage) VALUES (220000);
+--INSERT INTO min_voltage (voltage) VALUES (110000);
+INSERT INTO min_voltage (voltage) VALUES (220000);
 --INSERT INTO min_voltage (voltage) VALUES (380000);
 	
 

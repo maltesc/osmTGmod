@@ -1130,7 +1130,7 @@ BEGIN
 FOR v_params IN
 		-- Geht alle Kombinationen von Spannung und Frequenz (und relation_id) durch 
 		-- Dadurch werden circuits nur einzeln betrachtet
-		-- alle Ways haben die selbe relation_id und werde daher nicht nach dieser unterschieden
+		-- alle Ways haben die selbe relation_id und werde daher (automatisch) nicht nach dieser unterschieden
 	EXECUTE 'SELECT relation_id as id, voltage, frequency FROM '|| v_table ||' GROUP BY relation_id, voltage, frequency' 
 LOOP	
 
